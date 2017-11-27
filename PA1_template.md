@@ -8,64 +8,85 @@ output:
 
 
 ## Loading and preprocessing the data
-```{R echo=T}
+
+```r
 setwd("C:/Users/T470/Desktop/Coursera/Data Science/Reproducible Research/RepData_PeerAssessment1/data")
 am <- read.csv("activity.csv")
 ```
 ## What is mean total number of steps taken per day?
 
 #### First, generate DF with total steps per day
-```{R echo=T}
+
+```r
 am1 <- with(am,tapply(steps,date,sum,na.rm=T))
 am2 <- data.frame(date=row.names(am1),steps=as.integer(am1))
 ```
 
 #### Next, plot histogram of steps per day
-```{R echo=T}
+
+```r
 hist(am2$steps, main = "Histogram of Steps/Day",xlab="Steps/Day",ylab="Frequency", col="hotpink2")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+
 #### Finally, Calc mean and med of steps per day
-```{R echo=T}
+
+```r
 am2_mean <- round(mean(am2$steps),2)
 am2_med <- median(am2$steps)
 ```
-The mean steps per day is **`r am2_mean`** and the median is **`r am2_med`**
+The mean steps per day is **9354.23** and the median is **10395**
 
 
 ## What is the average daily activity pattern?
 
 ####First, generate DF with avg steps per interval
-```{r echo=T}
+
+```r
 am3 <- with(am,tapply(steps,interval,mean,na.rm=T))
 am4 <- data.frame(interval=row.names(am3),steps=as.integer(am3))
 am4$interval <- as.character(am4$interval)
 ```
 
 #### Then plot by interval
-```{r echo=T}
+
+```r
 plot(am4$interval,am4$steps,type="l",col="slateblue3",
      xlab="Interval",ylab="Mean Steps Taken", 
      lwd=3, main="Mean Steps by 5 Min Interval")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
+
 #### Find interval with max steps on avg
-```{R echo=T}
+
+```r
 am4_max <- am4[am4$steps==max(am4$steps),1]
 print(am4_max)
+```
+
+```
+## [1] "835"
 ```
 
 ## Imputing missing values
 
 #### Missing data was imputed by replacing it with the interval avg steps taken
 #### The first step was to count missing vals
-```{R echo=T}
+
+```r
 am_na <- sum(is.na(am))
 print(am_na)
 ```
 
+```
+## [1] 2304
+```
+
 #### Replace missing vals with avg interval value then recreate DF
-```{R echo=T}
+
+```r
 am5 <- merge(am,am4,by="interval")
 
 for (i in 1:nrow(am5)){
@@ -79,7 +100,8 @@ colnames(am_xna) <- c("interval","steps","date")
 ```
 
 #### Show new Histogram with NAs replaced
-```{R echo=T}
+
+```r
 #re-average steps per day
 #sum steps by day
 am1_xna <- with(am_xna,tapply(steps,date,sum,na.rm=T))
@@ -91,13 +113,26 @@ hist(am2$steps, main = "Histogram of Steps/Day",xlab="Steps/Day",ylab="Frequency
 hist(am2_xna$steps, main = "Histogram of Steps/Day [No NAs]",xlab="Steps/Day",ylab="Frequency", col="darkslategray3")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
+
 #### Recalc mean and med
-```{R echo=T}
+
+```r
 am2_xna_mean <- mean(am2_xna$steps)
 print(am2_xna_mean)
+```
+
+```
+## [1] 10749.77
+```
+
+```r
 am2_xna_med <- median(am2_xna$steps)
 print(am2_xna_med)
+```
 
+```
+## [1] 10641
 ```
 
 
@@ -105,8 +140,8 @@ print(am2_xna_med)
 
 #### Generate a plot showing weekend and weekday patterns together
 
-```{R echo=T}
 
+```r
 #create factor 
 am_xna$day <- as.factor(ifelse(weekdays(as.Date(as.character(am_xna$date))) %in% 
                                  c("Saturday","Sunday"),"weekend","weekday"))
@@ -129,7 +164,7 @@ plot(am_w1$interval,am_w1$steps,type="l",col="lightblue",
 lines(am_we1$interval,am_we1$steps,type="l",col="darkorchid1",
      lwd=3)
 legend("topleft",c("weekday","weekend"),col=c("lightblue","darkorchid1"),pch = c(15,15))
-
-
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
 

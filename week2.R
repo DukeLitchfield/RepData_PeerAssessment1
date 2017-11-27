@@ -1,15 +1,15 @@
 library(plyr)
 dev.off()
 # 1.) download data,save & format
-setwd("C:/Users/T470/Desktop/Coursera/Data Science/Reproducible Research/RepData_PeerAssessment1")
-download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip","dl.zip")
+setwd("C:/Users/T470/Desktop/Coursera/Data Science/Reproducible Research/RepData_PeerAssessment1/data")
+#download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip","dl.zip")
 
-if(!file.exists("data")) {
-  dir.create("data")
-}
-unzip("dl.zip", exdir = "data")
+#if(!file.exists("data")) {
+ # dir.create("data")
+#}
+#unzip("dl.zip", exdir = "data")
 
-setwd("data")
+#setwd("data")
 
 am <- read.csv("activity.csv")
 #sum steps by day
@@ -75,17 +75,25 @@ print(am2_xna_med)
 
 # 8.) Plot avg steps per interval by weekday vs weekend
 #create factor 
-
 am_xna$day <- as.factor(ifelse(weekdays(as.Date(as.character(am_xna$date))) %in% 
                                  c("Saturday","Sunday"),"weekend","weekday"))
 
+#weekdays
 am_w <- subset(am_xna,day=="weekday",select=c("interval","steps"))
+am_w1 <- with(am_w,tapply(steps,interval,mean,na.rm=T))
+am_w1 <- data.frame(interval=row.names(am_w1),steps=as.integer(am_w1))
+am_w1$interval <- as.character(am_w1$interval)
+
+#weekends
 am_we <- subset(am_xna,day!="weekday",select=c("interval","steps"))
-dev.off()
-plot(am_w$interval,am_w$steps,type="l",col="lightblue",
+am_we1 <- with(am_we,tapply(steps,interval,mean,na.rm=T))
+am_we1 <- data.frame(interval=row.names(am_we1),steps=as.integer(am_we1))
+am_we1$interval <- as.character(am_we1$interval)
+
+plot(am_w1$interval,am_w1$steps,type="l",col="lightblue",
      xlab="Interval",ylab="Mean Steps Taken", 
      lwd=3, main="Weekday v. Weekend: Mean Steps by 5 Min Interval")
-lines(am_we$interval,am_we$steps,type="l",col="darkorchid1",
+lines(am_we1$interval,am_we1$steps,type="l",col="darkorchid1",
      lwd=3)
 legend("topleft",c("weekday","weekend"),col=c("lightblue","darkorchid1"),pch = c(15,15))
 
